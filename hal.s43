@@ -1,0 +1,84 @@
+#include  "bsp.h"
+
+              MODULE HAL
+              PUBLIC SysConfig,Print2LEDs,ClrLEDs,PBs_handler,delay
+              PUBLIC Delay100us,Delayhalfsec
+              EXTERN GPIOconfig,TIMERconfig,ADCconfig
+              EXTERN state
+            
+              RSEG   CODE
+;--------------------------------------------------------------------
+;             System Configuration  
+;--------------------------------------------------------------------
+SysConfig     call #GPIOconfig
+              call #TIMERconfig
+              call #ADCconfig
+              ret
+;--------------------------------------------------------------------
+;Print LEDs - function only with argument (without return value)  
+;--------------------------------------------------------------------
+Print2LEDs    pop   R4        ; save return address
+              pop   R5        ; get value to print
+               
+              mov.b R5,LEDsOUT ;function body
+              
+              push.w  R4
+              ret   
+;--------------------------------------------------------------------
+;Clear LEDs - void function (without arguments and return value)
+;--------------------------------------------------------------------
+ClrLEDs       clr.b LEDsOUT
+              ret                 
+;----------------------------------------------------------------------- 
+;            PORT2 Interrupt Service Routine
+;-----------------------------------------------------------------------
+PBs_handler  push.w #debounceVal
+             call   #delay    
+             bit.b  #PB0,PBsFlag   ;check if PB0 is pushed
+             jnz    PB0sel 
+             bit.b  #PB1,PBsFlag   ;check if PB1 is pushed
+             jnz    PB1sel
+             bit.b  #PB2,PBsFlag   ;check if PB2 is pushed
+             jnz    PB2sel
+             reti                ; interrupt hapened from another source
+             
+PB0sel       mov    #1,state 
+             mov    #PB0,R4     ; which flag to clear
+             jmp    exitLPM0
+PB1sel       mov    #2,state
+             mov    #PB1,R4     ; which flag to clear
+             jmp    exitLPM0
+PB2sel       mov    #3,state    
+             mov    #PB2,R4     ; which flag to clear
+
+exitLPM0     bic    #CPUOFF,0(SP)  ; Exit LMP0
+             bic.b  R4,PBsFlag 
+             bis.w   #GIE,SR
+             reti
+;----------------------------------------------------------------------------------------------
+;            Polling based Delay functions
+;----------------------------------------------------------------------------------------------                     
+delay        pop   R4        ; save return address
+             pop   R5        ; get delay value
+             
+L            dec.w   R5      ;function body begin                 
+             jnz     L       ;function body end
+             
+             push.w  R4
+             ret
+             
+                   
+             
+Delay100us      mov.w   #33,R15 ;10^-6             
+L1              dec.w   R15                     
+                jnz     L1                                    
+                ret
+            
+Delayhalfsec    mov.w   #5000,R13              
+L2              call    #Delay100us
+                dec.w   R13                     
+                jnz     L2                                    
+                ret
+;----------------------------------------------------------------------------------------------
+             ENDMOD
+             END

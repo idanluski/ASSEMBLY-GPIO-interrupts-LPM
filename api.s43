@@ -1,0 +1,78 @@
+#include  "bsp.h"
+
+             MODULE API
+             PUBLIC IncLED,DecLED,enters1,enters2,enters3;,Wait314,Wait105
+             EXTERN Print2LEDs, enterLMP0,Delay100us,Delayhalfsec,state
+            
+             RSEG   CODE
+;-------------------------------------------------------------
+;             LEDs Increment counting 
+;-------------------------------------------------------------
+IncLED       inc.b   LEDsOUT
+             ret
+;-------------------------------------------------------------
+;             LEDs Decrement counting
+;-------------------------------------------------------------
+DecLED       dec.b   LEDsOUT
+             ret
+;-------------------------------------------------------------
+;             state 1 save last argument in R6
+;-------------------------------------------------------------
+enters1         
+                mov   #0x0014,R8 ;20 loops
+loop1           mov.b  R6,LEDsOUT
+                cmp   #0,R6 
+                jne   decone1
+                mov.b #0xff,R6
+                jmp   delaysec1
+decone1         dec   R6
+delaysec1       call  #Delayhalfsec
+                dec   R8
+                cmp   #0,R8    ;10 sec
+                jne   loop1
+                ret  
+;-------------------------------------------------------------
+;             state 2 save last argument in R9
+;-------------------------------------------------------------
+enters2         mov   #0x0009,R8 ;10 loops
+loop2           mov.b  R9,LEDsOUT
+                rla   R9  ; x2             
+                cmp   #0x0100,R9  
+                jne   decone2
+                mov.b #0x01,R9
+                jmp   delaysec2
+decone2         dec   R8
+delaysec2       call  #Delayhalfsec
+                cmp   #0,R8    
+                jne loop2
+                ret  
+                
+;-------------------------------------------------------------
+;             state 3 
+;-------------------------------------------------------------
+
+enters3         bis.w   #GIE,SR
+                bis.b    #0x80, signalOUT
+L1              call     #Wait314
+                bic.b    #0x80, signalOUT
+                call     #Wait105
+                cmp      #3,state
+                jeq      enters3
+                cmp      #2,state
+                jeq      enters2
+                cmp      #1,enters1
+                ret
+                
+                
+Wait314         mov.w   #97 ,R15              
+L2              dec.w   R15                     
+               jnz L2                                         
+                ret
+                
+Wait105         mov.w   #27,R15             
+L3              dec.w   R15                     
+                jnz L3                                         
+                ret
+;-------------------------------------------------------------
+             ENDMOD    
+             END

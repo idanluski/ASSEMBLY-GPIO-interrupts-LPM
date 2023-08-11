@@ -1,0 +1,52 @@
+#include  "bsp.h"
+
+            MODULE BSP
+            PUBLIC GPIOconfig,TIMERconfig,ADCconfig
+            EXTERN main,PBs_handler
+            
+            RSEG   CODE                    
+;-----------------------------------------------------------------------------  
+;           GPIO congiguration
+;-----------------------------------------------------------------------------
+GPIOconfig 
+             mov.w   #WDTPW+WDTHOLD,&WDTCTL   ; hold watchdog timer
+            ; PushButtons Setup
+             bic.b   #0xFF,PBsSel;io state
+             bic.b   #0x0F,PBsDir ;input state
+             bis.b   #0x03,PBsIES ; pull-up - off = 1 
+             bic.b   #0x04,PBsIES ; pull-down - off = 0
+             bis.b   #0x07,PBsIE  ; enable interrupt - 3 buttons
+             bis.b   #0x80,PBsDir
+             
+             bic.b   #0x0F,PBsFlag    ; zero in the flag
+             
+             ; LEDs Setup
+             bic.b   #0xFF,LEDsSel ; io state
+             bis.b   #0xFF,LEDsDIR ; output state
+             clr.b   LEDsOUT    ; turn off all leds
+             
+             ret
+;------------------------------------------------------------------------------------- 
+;            Timers congiguration 
+;-------------------------------------------------------------------------------------
+TIMERconfig 
+            nop   ;write here timers congiguration code
+
+            ret
+;-------------------------------------------------------------------------------------- 
+;            ADC congiguration 
+;--------------------------------------------------------------------------------------
+ADCconfig
+            nop ; write here ADC congiguration code
+
+            ret
+;---------------------------------------------------------------------------------------                  
+             COMMON  INTVEC   ; Interrupt Vectors-Begins a common segment name of INTVEC 
+;--------------------------------------------------------------------------------------
+             ORG     PORT2_VECTOR       ;PORT2 Interrupt Vector
+             DW      PBs_handler        ; interrupt handler = ISR
+             ORG     RESET_VECTOR       ; MSP430 RESET Vector
+             DW      main  
+            
+             ENDMOD
+             END
