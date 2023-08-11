@@ -1,4 +1,5 @@
 # GPIO-interrupts-LPM
+**this project is using MSP430 microcontroller**
 The software architecture of the system is required to be based on FSM Simple (see explanation in section E) (which performs one
 Out of four operations given an external interrupt request of pressing a button out of the four buttons 0PB 1, PB 2, PB 3, PB
 Connected to the four controller legs 2.0P - 2.3P, the array of LEDs will be connected to 1PORT.
