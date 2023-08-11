@@ -21,3 +21,16 @@ Verify this by using scope).
 
 **state - idle = 0:**
 The controller turns off the LEDs and returns to sleep mode (Sleep Mode).
+
+
+
+
+
+<img width="519" alt="image" src="https://github.com/idanluski/GPIO-interrupts-LPM/assets/129895992/1b132d6d-f88c-439b-993c-a0ced69bec36">\
+<img width="539" alt="image" src="https://github.com/idanluski/GPIO-interrupts-LPM/assets/129895992/a243cda3-0d6b-461a-b812-1f9227f58619">/
+<img width="246" alt="image" src="https://github.com/idanluski/GPIO-interrupts-LPM/assets/129895992/6742e3ec-477b-434f-ac71-619cd5162213">\
+<img width="169" alt="image" src="https://github.com/idanluski/GPIO-interrupts-LPM/assets/129895992/a82d617c-094f-4957-a7b6-ebe693a1b530">
+
+
+
+
